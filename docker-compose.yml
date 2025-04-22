@@ -1,7 +1,6 @@
 version: '3.8'
 
 services:
-
   zookeeper:
     image: confluentinc/cp-zookeeper:7.2.1
     ports:
@@ -31,31 +30,9 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: wassimos
-      POSTGRES_DB: userdb
+      POSTGRES_DB: systemreservationdb  # All services use this one DB
     ports:
-      - "5433:5432"
-    networks:
-      - default
-
-  postgres-salle:
-    image: postgres:15
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: wassimos
-      POSTGRES_DB: salledb
-    ports:
-      - "5434:5432"
-    networks:
-      - default
-
-  postgres-reservation:
-    image: postgres:15
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: wassimos
-      POSTGRES_DB: reservationdb
-    ports:
-      - "5435:5432"
+      - "5432:5432"
     networks:
       - default
 
@@ -67,25 +44,28 @@ services:
       - postgres-user
     networks:
       - default
+    entrypoint: ["bash", "/wait-for-postgres.sh", "postgres-user", "5432", "python", "app.py"]  # Use bash for script execution
 
   salle-service:
     build: ./salle-service
     ports:
       - "5002:5002"
     depends_on:
-      - postgres-salle
+      - postgres-user  # Same DB for all services
     networks:
       - default
+    entrypoint: ["bash", "/wait-for-postgres.sh", "postgres-user", "5432", "python", "app.py"]  # Use bash for script execution
 
   reservation-service:
     build: ./reservation-service
     ports:
       - "5003:5003"
     depends_on:
-      - postgres-reservation
+      - postgres-user  # Same DB for all services
       - kafka
     networks:
       - default
+    entrypoint: ["bash", "/wait-for-postgres.sh", "postgres-user", "5432", "python", "app.py"]  # Use bash for script execution
 
 networks:
   default:

@@ -1,12 +1,11 @@
-import os
+import os  # Add this import at the top
 
 class Config:
-    # Connexion à la base PostgreSQL via le nom du service Docker
-    SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:wassimos@postgres-reservation:5432/reservationdb'
+    # Using the same database for salles
+    SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:wassimos@postgres-user:5432/systemreservationdb'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-
-    # Clé secrète pour les tokens
     SECRET_KEY = os.environ.get("SECRET_KEY") or "dev"
+
 
     # Connexion à Kafka via le nom du service Docker
     KAFKA_BOOTSTRAP_SERVERS = 'kafka:9092'

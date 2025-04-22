@@ -9,6 +9,9 @@ db.init_app(app)
 @app.route("/users", methods=["POST"])
 def create_user():
     data = request.get_json()
+    if "username" not in data or "email" not in data:
+        return jsonify({"message": "Missing fields"}), 400
+
     new_user = User(username=data["username"], email=data["email"])
     db.session.add(new_user)
     db.session.commit()

@@ -9,6 +9,9 @@ db.init_app(app)
 @app.route("/salles", methods=["POST"])
 def create_salle():
     data = request.get_json()
+    if "nom" not in data or "capacite" not in data:
+        return jsonify({"message": "Missing fields"}), 400
+
     nouvelle_salle = Salle(nom=data["nom"], capacite=data["capacite"])
     db.session.add(nouvelle_salle)
     db.session.commit()
@@ -21,5 +24,6 @@ def get_salles():
 
 if __name__ == "__main__":
     with app.app_context():
-        db.create_all()
-    app.run(host="0.0.0.0", port=5002)
+        db.create_all()  # Create tables
+    app.run(host="0.0.0.0", port=5002)  # Ensure it listens on all addresses and port 5002
+
